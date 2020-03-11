@@ -1,0 +1,19 @@
+.avatar-uploader > .ant-upload {
+  width: 128px;
+  height: 128px;
+}
+.advert-img {
+  max-height: 100px;
+  border: 1px solid #f0f0f0;
+}
+.advert-item {
+  border: 1px solid #f0f0f0;
+  padding: 10px;
+}
+.ant-list-split .ant-list-item.advert-item:last-child {
+  border-bottom: 1px solid #f0f0f0;
+}
+.intro {
+  text-align: center;
+  border: none;
+}
