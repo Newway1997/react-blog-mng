@@ -5,6 +5,8 @@ import marked from "marked";
 import hljs from "highlight.js";
 import moment from "moment";
 import * as articleApi from "../api/articleApi";
+import ImageModal from "../components/ImageModal";
+import { FileImageOutlined } from "@ant-design/icons";
 const { Option } = Select;
 const { TextArea } = Input;
 
@@ -39,10 +41,10 @@ export default function AddArticle(props) {
       setArticleId(articleInfo.id);
       setArticleTitle(articleInfo.title);
       setArticleContent(articleInfo.article_content);
-      let html = marked(articleInfo.article_content);
+      let html = marked(articleInfo.article_content || "");
       setMarkdownContent(html);
       setIntroduce(articleInfo.introduce);
-      let tempInt = marked(articleInfo.introduce);
+      let tempInt = marked(articleInfo.introduce || "");
       setIntroducehtml(tempInt);
       setShowDate(articleInfo.addTime);
       setSelectType(articleInfo.typeId);
@@ -51,12 +53,12 @@ export default function AddArticle(props) {
   };
   const changeContent = e => {
     setArticleContent(e.target.value);
-    const html = marked(e.target.value);
+    const html = marked(e.target.value || "");
     setMarkdownContent(html);
   };
   const changeIntroduce = e => {
     setIntroduce(e.target.value);
-    const html = marked(e.target.value);
+    const html = marked(e.target.value || "");
     setIntroducehtml(html);
   };
   const changeTitle = e => {
@@ -72,6 +74,7 @@ export default function AddArticle(props) {
       }
     });
   };
+
   useEffect(() => {
     getTypeInfo();
     let tmpId = props.match.params.id;
@@ -97,6 +100,7 @@ export default function AddArticle(props) {
     dataProps.orderIndex = orderIndex;
     let localData = JSON.stringify(dataProps);
     localStorage.setItem("localData", localData);
+    message.success("暂存成功");
   };
   const getLocalData = () => {
     let localData = localStorage.getItem("localData");
@@ -104,10 +108,10 @@ export default function AddArticle(props) {
       let dataProps = JSON.parse(localData);
       setArticleTitle(dataProps.articleTitle);
       setArticleContent(dataProps.articleContent);
-      let html = marked(dataProps.articleContent);
+      let html = marked(dataProps.articleContent || "");
       setMarkdownContent(html);
       setIntroduce(dataProps.introduce);
-      let tempInt = marked(dataProps.introduce);
+      let tempInt = marked(dataProps.introduce || "");
       setIntroducehtml(tempInt);
       setShowDate(dataProps.showDate);
       setSelectType(dataProps.selectedType);
@@ -162,6 +166,19 @@ export default function AddArticle(props) {
   };
   const selectOrderIndexHandler = value => {
     setOrderIndex(value);
+  };
+  const [visible, setVisible] = useState(false);
+  const handleToolBar = () => {
+    setVisible(true);
+  };
+  const handleCancel = () => {
+    setVisible(false);
+  };
+  const handleOk = imgUrl => {
+    const newArticleContent = articleContent + `![image](${imgUrl})`;
+    setArticleContent(newArticleContent);
+    setMarkdownContent(marked(newArticleContent || ""));
+    setVisible(false);
   };
   return (
     <div>
@@ -221,6 +238,16 @@ export default function AddArticle(props) {
               </div>
             </Col>
           </Row>
+          <Row className="toolbar">
+            <Col span={1}>
+              <span>
+                <FileImageOutlined
+                  style={{ fontSize: "20px" }}
+                  onClick={handleToolBar}
+                />
+              </span>
+            </Col>
+          </Row>
           <Row>
             <Col span={12}>
               <TextArea
@@ -271,6 +298,11 @@ export default function AddArticle(props) {
           </Row>
         </Col>
       </Row>
+      <ImageModal
+        visible={visible}
+        onCancel={handleCancel}
+        onOk={handleOk}
+      ></ImageModal>
     </div>
   );
 }
