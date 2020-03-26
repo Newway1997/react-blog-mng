@@ -21,9 +21,12 @@ export default function ArticleList(props) {
       cancelText: "取消",
       okText: "确认",
       onOk() {
-        articleApi.deleteArticle(id).then(res => {
-          message.success("文章删除");
-          getList();
+        return new Promise((resolve, reject) => {
+          articleApi.deleteArticle(id).then(res => {
+            message.success("文章删除");
+            getList();
+            resolve();
+          });
         });
       },
       onCancel() {

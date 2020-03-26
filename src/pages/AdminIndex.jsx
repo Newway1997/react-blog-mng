@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout, Menu, Breadcrumb } from "antd";
 import {
   DesktopOutlined,
@@ -18,8 +18,11 @@ import AdvertMng from "./AdvertMng";
 const { Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
 export default function AdminIndex(props) {
-  let pathname = props.location.pathname;
-
+  let temp = props.location.pathname;
+  if (temp.match(/\/\d+$/)) {
+    temp = temp.replace(/\/\d+$/, "");
+  }
+  
   const [collapsed, setCollapsed] = useState(false);
   const onCollapse = collapsed => {
     setCollapsed(collapsed);
@@ -31,6 +34,7 @@ export default function AdminIndex(props) {
       props.history.push("/index/list");
     }
   };
+
   return (
     <Layout
       style={{
@@ -49,7 +53,13 @@ export default function AdminIndex(props) {
         onCollapse={onCollapse}
       >
         <div className="logo" />
-        <Menu theme="dark" defaultOpenKeys={['articleControl']} defaultSelectedKeys={[pathname]} mode="inline">
+        <Menu
+          theme="dark"
+          defaultOpenKeys={["articleControl"]}
+          defaultSelectedKeys={[temp]}
+          selectedKeys={[temp]}
+          mode="inline"
+        >
           <Menu.Item key="/index/">
             <Link to="/index/">
               <PieChartOutlined />

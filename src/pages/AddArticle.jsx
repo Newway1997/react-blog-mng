@@ -41,12 +41,15 @@ export default function AddArticle(props) {
       setArticleId(articleInfo.id);
       setArticleTitle(articleInfo.title);
       setArticleContent(articleInfo.article_content);
-      let html = marked(articleInfo.article_content || "");
-      setMarkdownContent(html);
-      setIntroduce(articleInfo.introduce);
-      let tempInt = marked(articleInfo.introduce || "");
-      setIntroducehtml(tempInt);
-      setShowDate(articleInfo.addTime);
+      //marked太耗cpu，会阻塞侧边栏菜单选择切换动画，暂时setTimeout解决
+      setTimeout(() => {
+        let html = marked(articleInfo.article_content || "");
+        setMarkdownContent(html);
+        setIntroduce(articleInfo.introduce);
+        let tempInt = marked(articleInfo.introduce || "");
+        setIntroducehtml(tempInt);
+      }, 300);
+      setShowDate(moment(articleInfo.addTime));
       setSelectType(articleInfo.typeId);
       setOrderIndex(articleInfo.orderIndex);
     });
@@ -87,8 +90,8 @@ export default function AddArticle(props) {
   const selectTypeHandler = value => {
     setSelectType(value);
   };
-  const dateChangeHander = (date, dateString) => {
-    setShowDate(dateString);
+  const dateChangeHander = date => {
+    setShowDate(date);
   };
   const localSave = () => {
     let dataProps = {};
@@ -96,7 +99,7 @@ export default function AddArticle(props) {
     dataProps.articleTitle = articleTitle;
     dataProps.articleContent = articleContent;
     dataProps.introduce = introduce;
-    dataProps.showDate = showDate;
+    dataProps.showDate = showDate.unix();
     dataProps.orderIndex = orderIndex;
     let localData = JSON.stringify(dataProps);
     localStorage.setItem("localData", localData);
@@ -113,7 +116,7 @@ export default function AddArticle(props) {
       setIntroduce(dataProps.introduce);
       let tempInt = marked(dataProps.introduce || "");
       setIntroducehtml(tempInt);
-      setShowDate(dataProps.showDate);
+      setShowDate(moment(dataProps.showDate * 1000));
       setSelectType(dataProps.selectedType);
       setOrderIndex(dataProps.orderIndex);
     }
@@ -141,8 +144,15 @@ export default function AddArticle(props) {
     dataProps.article_content = articleContent;
     dataProps.introduce = introduce;
     dataProps.orderIndex = orderIndex;
-    let dateText = showDate.replace("-", "/");
-    dataProps.addTime = new Date(dateText).getTime() / 1000;
+    let date = showDate;
+    if (date) {
+      const nowDate = new Date();
+      //设置时间
+      date.hour(nowDate.getHours());
+      date.minute(nowDate.getMinutes());
+      date.second(nowDate.getSeconds());
+    }
+    dataProps.addTime = date.utc(8).unix();
     if (articleId === 0) {
       dataProps.view_count = 0;
       articleApi.addArticle(dataProps).then(res => {
