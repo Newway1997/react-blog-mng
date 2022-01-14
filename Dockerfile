@@ -9,3 +9,5 @@ WORKDIR /home/project
 EXPOSE 3000
 # 容器创建完成后执行的命令，本来应该由服务器npm run build的，但是我的Linux配置不行，建议本地build就行，服务器nginx映射好就行
 # CMD npm install --registry=https://registry.npm.taobao.org && npm run build
+ADD react-blog-mng.conf /etc/nginx/conf.d
+RUN echo "daemon off;" >> /etc/nginx/conf.d/react-blog-mng.conf
